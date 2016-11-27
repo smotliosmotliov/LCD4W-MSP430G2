@@ -24,7 +24,7 @@ int main(void) {
 			}
 
 			sendData(hello[i], SETRS);
-			delays(16000000);
+			delays(10000000);
 		}
 
 		//delays(16000000);
