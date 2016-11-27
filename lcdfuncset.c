@@ -1,10 +1,11 @@
 /*
  * This file is writen from Deni Smotliov and its used
- * for declaring function and variable from LCD_4Wire driver.
+ * for initialize function and variable from LCD_4Wire driver.
  */
 #include <msp430g2553.h>
 #include "lcdfuncset.h"
-//define function
+#include <string.h>
+
 unsigned int checTime;
 uint8_t division;
 
@@ -22,8 +23,14 @@ void initMSP430()	{
 
 }
 //end
+
+/*
+ * Bus scan function is writen separetly for purpose.
+ * This function clock correct in time pulses into LCD
+ * whit it LCD do write and read operation in write time.
+ */
 void busScan(uint8_t instData)	{
-	if(instData==SETRS)	{
+	if(instData==SETRS)	{					//Define data write cicle
 		P2OUT &=~RS;
 		P2OUT |=RW;
 		delays(32000);
@@ -38,7 +45,7 @@ void busScan(uint8_t instData)	{
 		P2OUT |=RW;
 		delays(16000);
 	}
-	else if(instData==RESETRS)	{
+	else if(instData==RESETRS)	{			//Define instruction write cicle
 		P2OUT |=RS;
 		P2OUT |=RW;
 		P2OUT &=~EN;
@@ -56,7 +63,12 @@ void busScan(uint8_t instData)	{
 	}
 	P2OUT &=~(RS|RW|EN);
 }
-
+/*
+ * This is core function. About it MSP430 write data or instruction on LCD.
+ * Because LCD is in 4-wire mode, data are send with nibble structure.
+ * First is send MSB nibble, start bus sync, secon send LSB nibble and
+ * start bus sync.
+ */
 void sendData(char sendBits, uint8_t bitForRS)	{					//Write Data to LCD RAM
 	char lowNibble = (sendBits & LHMASK);							//Extract low nibble bits
 	P2OUT &=~0x0F;													//Clear data bits
@@ -68,20 +80,48 @@ void sendData(char sendBits, uint8_t bitForRS)	{					//Write Data to LCD RAM
 	busScan(bitForRS);
 }
 
-void setAddress(uint8_t lineX, uint8_t lineY)	{					//Sets DD RAM address in address counter
-uint8_t addresSet = 0x80;											//This address is 7 bits and 1 for setting
+/*
+ * This function is used for define address on LCD.
+ * Beacause MSB bit on data line is need to be on hight state,
+ * we need add 0x80.
+ */
+void iWrite(const char* data, uint8_t possitionX, uint8_t lineY)	{					//Sets DD RAM address in address counter
+	volatile uint8_t addresSet = 0x80;											//This address is 7 bits and 1 for setting
+	size_t lenght=strlen(data);
+	int xp;
+	for(xp=possitionX;xp<(lenght); xp++)	{
+		if(lineY==1 && possitionX<=8)	{
+			sendData(addresSet|(possitionX++), RESETRS);
+			sendData(*(data++), SETRS);
+			if(possitionX==8)	{
+				addresSet = 0xC0;
+				lineY=2;
+				possitionX=0;
+			}
+			//do something to write on line 0
 
-	if(lineY==1)	{
-		lineX |= (lineX & LHMASK);									//Correction for real addressing into lineX
-		addresSet |= ((lineY-1)+(lineX-1));
-		sendData(addresSet, RESETRS);
+		}
+		else if (lineY==2 && possitionX<=8)	{
+			sendData(addresSet|(possitionX++), RESETRS);
+			sendData(*(data++), SETRS);
+			if(possitionX==8)	{
+				addresSet = 0x80;
+				lineY=1;
+				possitionX=0;
+			}
+			//do something to write on line 1
+		}
+		else	{
+			char bad[]="BAD_ADD";
+			int i;
+			for(i=0;i<(sizeof(bad)/sizeof(bad[0])); i++){
+				sendData((i|0x80), RESETRS);
+				sendData(bad[i], SETRS);
+			}
+
+		}
 	}
-	else if (lineY==2){
-		addresSet |=(lineY<<4);										//This line make shifting for correct addressing
-		lineX = (lineX & LHMASK);									//Correction for real addressing into lineX
-		addresSet += (lineX-1);
-		sendData(addresSet, RESETRS);
-	}
+
 
 }
 
@@ -117,9 +157,11 @@ void shiftDispOrCur(uint8_t cur, uint8_t disp)	{			//Set cursor moving and disp 
 }
 
 
-
+/*
+ * This function is initialize LCD display with him delay parameters
+ */
 void initLCD()	{
-	delays(480000);
+	delays(480000);					//Wheith for 30ms for power stable
 	functionSet();
 	delays(16000);
 	dispControl();
@@ -130,8 +172,13 @@ void initLCD()	{
 }
 
 
-//This timer may be wrong!!!!!!!!!!!!!!
-void delays(unsigned long time){
+/*
+ * This delay function use a timerA0 on MSP430. When this function is used
+ * timer is activated and CPU on MSP430 is going down to LOW POWER MOD/LPM0.
+ * TimerA0 is count to 0 after that going to interrupt service routine and
+ * load new value or clear and start CPU again.
+ */
+void delays(unsigned long time)	{
 	if(time>1600000 && time <=16000000)	{
 		division = 160;
 		checTime = (time/division);
@@ -143,34 +190,35 @@ void delays(unsigned long time){
 	else if(time>200000 && time <=500000){
 		division = 8;
 		checTime = (time/division);
+	}
 
+	else if(time>132000 && time<=196000)	{
+		division = 4;
+		checTime = (time/division);
 	}
 	else if(time>65500 && time <= 132000)	{
-		division = 2;
-		checTime = (time/division);
-
-	}
-	else if(time>131000 && time<=196000)	{
-		division = 3;
-		checTime = (time/division);
+			division = 2;
+			checTime = (time/division);
 
 	}
 	else	{
 		division =0;
 		checTime = 0;
-
 	}
-	CCTL0 = CCIE;                             // CCR0 interrupt enabled
+	CCTL0 = CCIE;                             	// CCR0 interrupt enabled
 	CCR0 = time;
-	TACTL = TASSEL_2 + MC_2;                  // SMCLK, contmode
-	_BIS_SR(LPM0_bits);			//Enter LPM0 w/ interrupt
+	TACTL = TASSEL_2 + MC_2;                  	// SMCLK, contmode
+	_BIS_SR(LPM0_bits);							//Enter LPM0 w/ interrupt
 }
 
-// Timer A1 interrupt service routine
+// Timer A0 interrupt service routine
+/*
+ * This routine is serve for delays() function
+ */
  #pragma vector=TIMER0_A0_VECTOR
  __interrupt void Timer_A0 (void)
  {
-   P1OUT ^= 0x01;                            // Toggle P1.0
+   P1OUT ^= 0x01;                            		// Toggle P1.0/ indicator for correctnes
 
 
    if(division>0)	{
@@ -179,10 +227,9 @@ void delays(unsigned long time){
 
    }
    else	{
-	   //_BIS_SR(LPM4_bits + GIE);			//Enter LPM4 w/ interrupt
 	   CCTL0 &=~CCIE;
 	   division=0;
-	   __bic_SR_register_on_exit(CPUOFF);
+	   __bic_SR_register_on_exit(CPUOFF);			//Activate CPU with clear LPM bits
    }
  }
 
