@@ -33,10 +33,7 @@ int main(void) {
 		for(;count>0;count--)	{
 			delays(16000000);
 		}
-		delays(16000000);
 		P1OUT ^=0x40;
-
-
 	}
 }
 
