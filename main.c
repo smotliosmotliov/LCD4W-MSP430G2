@@ -29,11 +29,19 @@ int main(void) {
 			delays(5000000);
 		}
 		clearDisplay();
-		iWrite(" AZ sam Bulgache", 0,1);
+		iWrite(" AZ sam Bulgarin", 0,1);
 		for(;count>0;count--)	{
 			delays(16000000);
 		}
 		P1OUT ^=0x40;
+		clearDisplay();
+		sendData(0x82, RESETRS);
+		delays(16000000);
+		sendData(0x73, RESETRS);
+		count=10;
+		for(;count>0;count--)	{
+			delays(16000000);
+		}
 	}
 }
 
