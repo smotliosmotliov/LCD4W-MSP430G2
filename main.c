@@ -29,15 +29,51 @@ int main(void) {
 			delays(5000000);
 		}
 		clearDisplay();
-		iWrite(" AZ sam Bulgarin", 0,1);
+		iWrite("Writed ON CCS6.1", 0,1);
 		for(;count>0;count--)	{
 			delays(16000000);
 		}
 		P1OUT ^=0x40;
+		//Draw with character CGROM data
 		clearDisplay();
-		sendData(0x82, RESETRS);
-		delays(16000000);
-		sendData(0x73, RESETRS);
+		addr=0;
+		for(i=0; i<16; i++)	{
+			if(addr==7)	{
+				addr=0x40;
+			}
+			else	{
+				sendData((addr++)|0x80, RESETRS);
+			}
+
+			sendData(0xFF, SETRS);
+			delays(5000000);
+		}
+		//Try anime
+		clearDisplay();
+		sendData(0xC3, RESETRS);
+		sendData(0x5F, SETRS);
+		delays(5000000);
+		sendData(0xC3, RESETRS);
+		sendData(0x1D, SETRS);
+		delays(5000000);
+		sendData(0xC3, RESETRS);
+		sendData(0x2D, SETRS);
+		delays(5000000);
+		sendData(0xC3, RESETRS);
+		sendData(0xFF, SETRS);
+		delays(5000000);
+		sendData(0x83, RESETRS);
+		sendData(0x5F, SETRS);
+		delays(5000000);
+		sendData(0x83, RESETRS);
+		sendData(0x1D, SETRS);
+		delays(5000000);
+		sendData(0x83, RESETRS);
+		sendData(0x2D, SETRS);
+		delays(5000000);
+		sendData(0x83, RESETRS);
+		sendData(0xFF, SETRS);
+		delays(5000000);
 		count=10;
 		for(;count>0;count--)	{
 			delays(16000000);
