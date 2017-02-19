@@ -5,12 +5,19 @@
  *      Author: Deni
  */
 #include <msp430g2553.h>
+#include "lcdfuncset.h"
 
 #ifndef ADC10SUPPORT_H_
 #define ADC10SUPPORT_H_
 
-void initializeADC10();
+#define ERROR "Error input"
+int ADC10GetData;
+char* statusCtrl;
+void initializeADC10(void);
 void buttonCheckADC10();
 
+
+__interrupt void buttonPress_ISR(void);
+__interrupt void ADC10_ISR(void);
 
 #endif /* ADC10SUPPORT_H_ */

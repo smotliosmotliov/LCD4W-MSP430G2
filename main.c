@@ -1,6 +1,6 @@
 
-#include "lcdfuncset.h"
-#include <msp430g2553.h>
+//#include <msp430g2553.h>
+#include "adc10support.h"
 /*
  * main.c
  */
@@ -8,12 +8,13 @@ unsigned char hello[] = {"DENI+MSP430G2553"};
 char Bukva = 'D';
 
 
-
 int main(void) {
 	initMSP430();
 	initLCD();
+	initializeADC10();
 	int count;
 	while(1){
+		buttonCheckADC10();
 		count=10;
 		clearDisplay();
 		unsigned char i, addr=0;
@@ -48,36 +49,8 @@ int main(void) {
 			sendData(0xFF, SETRS);
 			delays(5000000);
 		}
-		//Try anime
 		clearDisplay();
-		sendData(0xC3, RESETRS);
-		sendData(0x5F, SETRS);
-		delays(5000000);
-		sendData(0xC3, RESETRS);
-		sendData(0x1D, SETRS);
-		delays(5000000);
-		sendData(0xC3, RESETRS);
-		sendData(0x2D, SETRS);
-		delays(5000000);
-		sendData(0xC3, RESETRS);
-		sendData(0xFF, SETRS);
-		delays(5000000);
-		sendData(0x83, RESETRS);
-		sendData(0x5F, SETRS);
-		delays(5000000);
-		sendData(0x83, RESETRS);
-		sendData(0x1D, SETRS);
-		delays(5000000);
-		sendData(0x83, RESETRS);
-		sendData(0x2D, SETRS);
-		delays(5000000);
-		sendData(0x83, RESETRS);
-		sendData(0xFF, SETRS);
-		delays(5000000);
-		count=10;
-		for(;count>0;count--)	{
-			delays(16000000);
-		}
+		iWrite("Writed ON CCS6.1", 0,1);
 	}
 }
 
