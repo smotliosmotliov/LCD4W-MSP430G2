@@ -4,11 +4,12 @@
  *  Created on: Feb 18, 2017
  *      Author: Deni
  */
-#include <msp430g2553.h>
-#include "lcdfuncset.h"
+
+
 
 #ifndef ADC10SUPPORT_H_
 #define ADC10SUPPORT_H_
+
 
 #define ERROR "Error input"
 int ADC10GetData;

@@ -17,8 +17,10 @@ void initMSP430()	{
 	P1DIR |=0x41;
 	P2SEL &= ~0xC0;										//Use XIN (2.7) and XOUT (2.6) as Output Pins
 	CCTL0 = CCIE;                             			// CCR0 interrupt enabled
-	P2DIR |=0xFF;											//Set direction on PORT2
-	P2OUT &=~0xFF;
+	P3DIR |=0xFF;											//Set direction on PORT2
+	P3OUT &=~0xFF;
+	P2DIR |=0x04;
+	P2OUT |=0x04;
 	_BIS_SR(GIE);											//Interrupt enable
 
 }
@@ -31,37 +33,37 @@ void initMSP430()	{
  */
 void busScan(uint8_t instData)	{
 	if(instData==SETRS)	{					//Define data write cicle
-		P2OUT &=~RS;
-		P2OUT |=RW;
+		P3OUT &=~RS;
+		P3OUT |=RW;
 		delays(32000);
-		P2OUT |= RS;
-		P2OUT &=~(RW|EN);
+		P3OUT |= RS;
+		P3OUT &=~(RW|EN);
 		delays(16000);
-		P2OUT |=EN;
+		P3OUT |=EN;
 		delays(32000);
-		P2OUT &=~EN;
+		P3OUT &=~EN;
 		delays(16000);
-		P2OUT &=~RS;
-		P2OUT |=RW;
+		P3OUT &=~RS;
+		P3OUT |=RW;
 		delays(16000);
 	}
 	else if(instData==RESETRS)	{			//Define instruction write cicle
-		P2OUT |=RS;
-		P2OUT |=RW;
-		P2OUT &=~EN;
+		P3OUT |=RS;
+		P3OUT |=RW;
+		P3OUT &=~EN;
 		delays(32000);
-		P2OUT &=~RS;
-		P2OUT &=~RW;
+		P3OUT &=~RS;
+		P3OUT &=~RW;
 		delays(16000);
-		P2OUT |=EN;
+		P3OUT |=EN;
 		delays(32000);
-		P2OUT &=~EN;
+		P3OUT &=~EN;
 		delays(16000);
-		P2OUT |=RS;
-		P2OUT |=RW;
+		P3OUT |=RS;
+		P3OUT |=RW;
 		delays(32000);
 	}
-	P2OUT &=~(RS|RW|EN);
+	P3OUT &=~(RS|RW|EN);
 }
 /*
  * This is core function. About it MSP430 write data or instruction on LCD.
@@ -71,12 +73,12 @@ void busScan(uint8_t instData)	{
  */
 void sendData(char sendBits, uint8_t bitForRS)	{					//Write Data to LCD RAM
 	char lowNibble = (sendBits & LHMASK);							//Extract low nibble bits
-	P2OUT &=~0x0F;													//Clear data bits
+	P3OUT &=~0x0F;													//Clear data bits
 	//Set Enable bit
-	P2OUT |= ((sendBits & HHMASK)>>4);								//Send MSB Octet into Data BUS
+	P3OUT |= ((sendBits & HHMASK)>>4);								//Send MSB Octet into Data BUS
 	busScan(bitForRS);
-	P2OUT &=~0x0F;
-	P2OUT |= lowNibble;												//Extract LSB Nibble
+	P3OUT &=~0x0F;
+	P3OUT |= lowNibble;												//Extract LSB Nibble
 	busScan(bitForRS);
 }
 

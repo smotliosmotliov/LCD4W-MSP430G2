@@ -1,6 +1,9 @@
 
-//#include <msp430g2553.h>
+#include <msp430g2553.h>
+#include "lcdfuncset.h"
 #include "adc10support.h"
+#include "i2csupport.h"
+
 /*
  * main.c
  */
@@ -15,6 +18,8 @@ int main(void) {
 	int count;
 	while(1){
 		buttonCheckADC10();
+		i2cInitialization();
+		i2cCommunication();
 		count=10;
 		clearDisplay();
 		unsigned char i, addr=0;

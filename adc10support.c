@@ -4,8 +4,10 @@
  *  Created on: Feb 18, 2017
  *      Author: Deni
  */
-#include "adc10support.h"
 
+#include "adc10support.h"
+#include "lcdfuncset.h"
+#include <msp430g2553.h>
 //Define function for ADC10 initialization details for MSP430G2553
 
 void initializeADC10(void)	{

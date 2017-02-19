@@ -3,9 +3,13 @@
  * and its used for define function prototypes and macros definition
  * for LCD_4Wire display driver.
  */
-#include <inttypes.h>
+
+
+
 #ifndef LCDFUNCSET_H_
 #define LCDFUNCSET_H_
+
+#include <inttypes.h>
 //Deffine
 #define MASK	0xFF
 #define LHMASK	0x0F
