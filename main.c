@@ -55,7 +55,8 @@ int main(void) {
 			delays(5000000);
 		}
 		clearDisplay();
-		iWrite("Writed ON CCS6.1", 0,1);
+		iWrite("ADC10 and I2C support", 0,1);
+		delays(5000000);
 	}
 }
 

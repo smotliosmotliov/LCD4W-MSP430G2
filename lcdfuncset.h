@@ -14,13 +14,13 @@
 #define MASK	0xFF
 #define LHMASK	0x0F
 #define HHMASK	0xF0
-#define RS		0x10			//Data/Instruction select
-#define RW		0x20			//Read/Write Select
-#define EN		0x40			//Enable Signal
-#define D0		0x01			//Data signal 0
-#define D1		0x02			//Data signal 1
-#define D2		0x04			//Data signal 2
-#define D3		0x08			//Data signal 3
+#define RS		0x02			//Data/Instruction select
+#define RW		0x04			//Read/Write Select
+#define EN		0x08			//Enable Signal
+#define D0		0x10			//Data signal 0
+#define D1		0x20			//Data signal 1
+#define D2		0x40			//Data signal 2
+#define D3		0x80			//Data signal 3
 #define MVDATA	(D3|D2|D1|D0)	//Nibble structure
 #define SETRS	(int)1
 #define	RESETRS	(int)0

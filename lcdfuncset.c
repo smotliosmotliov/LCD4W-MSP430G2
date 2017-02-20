@@ -15,7 +15,6 @@ void initMSP430()	{
 	BCSCTL1 = CALBC1_16MHZ;
 	DCOCTL = CALDCO_16MHZ;
 	P1DIR |=0x41;
-	P2SEL &= ~0xC0;										//Use XIN (2.7) and XOUT (2.6) as Output Pins
 	CCTL0 = CCIE;                             			// CCR0 interrupt enabled
 	P3DIR |=0xFF;											//Set direction on PORT2
 	P3OUT &=~0xFF;
@@ -72,14 +71,16 @@ void busScan(uint8_t instData)	{
  * start bus sync.
  */
 void sendData(char sendBits, uint8_t bitForRS)	{					//Write Data to LCD RAM
-	char lowNibble = (sendBits & LHMASK);							//Extract low nibble bits
-	P3OUT &=~0x0F;													//Clear data bits
+	char HighNibble = (sendBits & HHMASK);							//Extract low nibble bits
+	P3OUT &=~0xF0;													//Clear data bits
+	P3OUT |= HighNibble;												//Send MSB Octet into Data BUS
+	busScan(bitForRS);												//Extract LSB Nibble
 	//Set Enable bit
-	P3OUT |= ((sendBits & HHMASK)>>4);								//Send MSB Octet into Data BUS
+	P3OUT &=~0xF0;
+	P3OUT |= ((sendBits & LHMASK)<<4);
 	busScan(bitForRS);
-	P3OUT &=~0x0F;
-	P3OUT |= lowNibble;												//Extract LSB Nibble
-	busScan(bitForRS);
+
+
 }
 
 /*

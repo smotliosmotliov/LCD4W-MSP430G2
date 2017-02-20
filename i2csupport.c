@@ -16,10 +16,10 @@ void i2cInitialization(void)		{
 	P1SEL2|= BIT6 + BIT7;                     // Assign I2C pins to USCI_B0
 	UCB0CTL1 |= UCSWRST;                      // Enable SW reset
 	UCB0CTL0 = UCMST + UCMODE_3 + UCSYNC;     // I2C Master, synchronous mode
-	UCB0CTL1 = UCSSEL_2 + UCSWRST;            // Use SMCLK, keep SW reset
-	UCB0BR0 = 40;                             // fSCL = SMCLK/40 = ~400kHz
+	UCB0CTL1 = UCSSEL_0 + UCSWRST;            // Use SMCLK, keep SW reset
+	UCB0BR0 = 10;                             // fSCL = SMCLK/40 = ~400kHz
 	UCB0BR1 = 0;
-	UCB0I2CSA = 0xCF;                         // Set slave address
+	UCB0I2CSA = 0x4F;                         // Set slave address
 	UCB0CTL1 &= ~UCSWRST;                     // Clear SW reset, resume operation
 	IE2 |= UCB0RXIE;                          // Enable RX interrupt
 	TA1CTL = TASSEL_2 + MC_2;                  // SMCLK, contmode
@@ -63,25 +63,6 @@ __interrupt void TA1_ISR(void)	{
 
 #pragma vector = USCIAB0TX_VECTOR
 __interrupt void USCIAB0TX_ISR(void)	{
-  RxByteCtr--;                              // Decrement RX byte counter
-
-  if (RxByteCtr)
-  {
-    RxWord = (unsigned int)UCB0RXBUF << 8;  // Get received byte
-    if (RxByteCtr == 1)                     // Only one byte left?
-      UCB0CTL1 |= UCTXSTP;                  // Generate I2C stop condition
-  }
-  else
-  {
-    RxWord |= UCB0RXBUF;                    // Get final received byte,
-                                            // Combine MSB and LSB
-    __bic_SR_register_on_exit(CPUOFF);      // Exit LPM0
-  }
-}
-
-
-#pragma vector = USCIAB0RX_VECTOR
-__interrupt void USCIAB0RX_ISR(void)	{
   RxByteCtr--;                              // Decrement RX byte counter
 
   if (RxByteCtr)
