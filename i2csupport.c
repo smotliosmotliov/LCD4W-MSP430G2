@@ -19,7 +19,7 @@ void i2cInitialization(void)		{
 	UCB0CTL1 = UCSSEL_0 + UCSWRST;            // Use SMCLK, keep SW reset
 	UCB0BR0 = 10;                             // fSCL = SMCLK/40 = ~400kHz
 	UCB0BR1 = 0;
-	UCB0I2CSA = 0x4F;                         // Set slave address
+	UCB0I2CSA = 0x9F;                         // Set slave address
 	UCB0CTL1 &= ~UCSWRST;                     // Clear SW reset, resume operation
 	IE2 |= UCB0RXIE;                          // Enable RX interrupt
 	TA1CTL = TASSEL_2 + MC_2;                  // SMCLK, contmode
@@ -52,7 +52,7 @@ void i2cCommunication(void)	{
 	return;
 }
 
-#pragma vector = TIMER1_A0_VECTOR
+#pragma vector = TIMER1_A1_VECTOR
 __interrupt void TA1_ISR(void)	{
   __bic_SR_register_on_exit(CPUOFF);        // Exit LPM0
 }
@@ -75,6 +75,6 @@ __interrupt void USCIAB0TX_ISR(void)	{
   {
     RxWord |= UCB0RXBUF;                    // Get final received byte,
                                             // Combine MSB and LSB
-    __bic_SR_register_on_exit(CPUOFF);      // Exit LPM0
+   // __bic_SR_register_on_exit(CPUOFF);      // Exit LPM0
   }
 }
