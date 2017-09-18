@@ -3,6 +3,7 @@
 #include "lcdfuncset.h"
 #include "adc10support.h"
 #include "i2csupport.h"
+#include "uart_driver.h"
 
 /*
  * main.c
@@ -15,10 +16,10 @@ int main(void) {
 	initMSP430();
 	initLCD();
 	initializeADC10();
+	i2cInitialization();
 	int count;
 	while(1){
 		buttonCheckADC10();
-		i2cInitialization();
 		i2cCommunication();
 		count=10;
 		clearDisplay();
@@ -51,11 +52,13 @@ int main(void) {
 				sendData((addr++)|0x80, RESETRS);
 			}
 
-			sendData(0xFF, SETRS);
+			sendData(0xF6, SETRS);
 			delays(5000000);
 		}
 		clearDisplay();
-		iWrite("ADC10 and I2C support", 0,1);
+		iWrite("ADC10 and I2C ST", 0,1);
+		delays(5000000);
+		iWrite("ADC10 and I2C ST", 0,1);
 		delays(5000000);
 	}
 }

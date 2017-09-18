@@ -11,15 +11,15 @@ uint8_t division;
 
 //Initialize MSP430G2
 void initMSP430()	{
-	WDTCTL = WDTPW | WDTHOLD;							// Stop watchdog timer
+	WDTCTL = WDTPW | WDTHOLD;								// Stop watchdog timer
 	BCSCTL1 = CALBC1_16MHZ;
 	DCOCTL = CALDCO_16MHZ;
 	P1DIR |=0x41;
-	CCTL0 = CCIE;                             			// CCR0 interrupt enabled
+	CCTL0 = CCIE;                             				// CCR0 interrupt enabled
 	P3DIR |=0xFF;											//Set direction on PORT2
 	P3OUT &=~0xFF;
-	P2DIR |=0x04;
-	P2OUT |=0x04;
+//	P2DIR |=0x04;
+//	P2OUT |=0x04;
 	_BIS_SR(GIE);											//Interrupt enable
 
 }

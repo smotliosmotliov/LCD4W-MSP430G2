@@ -17,9 +17,9 @@ void i2cInitialization(void)		{
 	UCB0CTL1 |= UCSWRST;                      // Enable SW reset
 	UCB0CTL0 = UCMST + UCMODE_3 + UCSYNC;     // I2C Master, synchronous mode
 	UCB0CTL1 = UCSSEL_0 + UCSWRST;            // Use SMCLK, keep SW reset
-	UCB0BR0 = 10;                             // fSCL = SMCLK/40 = ~400kHz
+	UCB0BR0 = 80;                             // fSCL = SMCLK/40 = ~400kHz
 	UCB0BR1 = 0;
-	UCB0I2CSA = 0x9F;                         // Set slave address
+	UCB0I2CSA = 0x91;                         // Set slave address
 	UCB0CTL1 &= ~UCSWRST;                     // Clear SW reset, resume operation
 	IE2 |= UCB0RXIE;                          // Enable RX interrupt
 	TA1CTL = TASSEL_2 + MC_2;                  // SMCLK, contmode
